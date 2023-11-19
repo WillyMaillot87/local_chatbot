@@ -1,5 +1,9 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+from huggingface_hub import login
+from decouple import config
+
+login(config('HF_TOKEN'))
 
 model_id = "meta-llama/Llama-2-7b-chat-hf"
 
