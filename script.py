@@ -1,25 +1,44 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline, set_seed,BlenderbotTokenizerFast, BlenderbotForConditionalGeneration
 from huggingface_hub import login
 from decouple import config
 
-login(config('HF_TOKEN'))
+#Login to HuggingFace
+# try:
+#     login(config('HF_TOKEN'))
+# except Exception as e:
+#     print(f"Une erreur s'est produite : {e}")
 
-model_id = "meta-llama/Llama-2-7b-chat-hf"
 
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-llm = AutoModelForCausalLM.from_pretrained(model_id)
+# models_dict = {
+#   "LLAMA-2" : "meta-llama/Llama-2-7b-chat-hf",
+#   "GPT2" : "gpt2-large",
+#   "BlenderBot" : "facebook/blenderbot-400M-distill",
+#   "Wizard" : "TheBloke/Wizard-Vicuna-7B-Uncensored-GPTQ",
+#   "GPT-neo" : "EleutherAI/gpt-neo-2.7B"
+# }
 
-# Let's chat for 5 lines
-for step in range(5):
-    # encode the new user input, add the eos_token and return a tensor in Pytorch
-    new_user_input_ids = tokenizer.encode(input(">> User:") + tokenizer.eos_token, return_tensors='pt')
+model_name = "facebook/blenderbot-400M-distill"
 
-    # append the new user input tokens to the chat history
-    bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if step > 0 else new_user_input_ids
+#Tokenizer
+tokenizer = BlenderbotTokenizerFast.from_pretrained(model_name)
 
-    # generated a response while limiting the total chat history to 1000 tokens, 
-    chat_history_ids = llm.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
+# Model
+model = BlenderbotForConditionalGeneration.from_pretrained(model_name)
 
-    # pretty print last ouput tokens from bot
-    print("DialoGPT: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+# Run the chatbot
+while True:
+  query = input("\nUser: ")
+  if query == "exit":
+    break
+  if query.strip() == "":
+    continue
+
+  # Générer une réponse en prenant en compte tout l'historique
+  inputs = tokenizer([query], return_tensors="pt", max_length=1024, padding='longest')
+  reply_ids = model.generate(**inputs)
+
+  # Décoder la réponse
+  bot_output = tokenizer.decode(reply_ids[0], skip_special_tokens=True)
+
+  # afficher la réponse
+  print(f"Bot: {bot_output}")
