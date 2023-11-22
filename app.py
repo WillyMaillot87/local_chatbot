@@ -23,7 +23,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("Tapper ici pour dialoguer"):
+if prompt := st.chat_input("What's Up ?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -32,7 +32,7 @@ if prompt := st.chat_input("Tapper ici pour dialoguer"):
         message_placeholder = st.empty()
         full_response = ""
 
-        # Générer une réponse en prenant en compte tout l'historique
+        # Generate response based on the chat history
         inputs = tokenizer([prompt], return_tensors="pt", max_length=1024, padding='longest')
         response = model.generate(**inputs)
 
@@ -59,8 +59,3 @@ with st.sidebar :
         st.session_state.messages = []
     else:
         st.write(f"History size : {len(st.session_state.messages)}")
-
-    
-
-#TODO :
-# Ajouter un bouton pour clean la session (nettoyer le session_state) avec for key in st.session_state.keys(): del st.session_state[key]
