@@ -1,2 +1,5 @@
 # TalkingBot
- Local conversational AI bot
+ Simple Local conversational bot
+
+
+docker run 
