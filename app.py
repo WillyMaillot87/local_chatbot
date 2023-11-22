@@ -38,7 +38,7 @@ if prompt := st.chat_input("Tapper ici pour dialoguer"):
 
         # Décoder la réponse
         output_text = tokenizer.decode(response[0], skip_special_tokens=True)
-        
+
         # Simulate stream of response with milliseconds delay
         for chunk in output_text.split():
             full_response += chunk + " "
@@ -47,6 +47,20 @@ if prompt := st.chat_input("Tapper ici pour dialoguer"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+# Display sidebar
+with st.sidebar :
+    #Link to the githupb repo
+    st.link_button("Go to GitHub Repository", "https://github.com/WillyMaillot87/my_llm_project")
+
+    # Add button to clear the chat history
+    if st.button('Clear Chat History', type="primary"):
+        st.write('Chat history erased')
+        st.session_state.messages = []
+    else:
+        st.write(f"History size : {len(st.session_state.messages)}")
+
+    
 
 #TODO :
 # Ajouter un bouton pour clean la session (nettoyer le session_state) avec for key in st.session_state.keys(): del st.session_state[key]
