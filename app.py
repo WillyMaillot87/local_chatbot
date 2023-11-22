@@ -30,19 +30,22 @@ if prompt := st.chat_input("Tapper ici pour dialoguer"):
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
+        full_response = ""
 
         # Générer une réponse en prenant en compte tout l'historique
         inputs = tokenizer([prompt], return_tensors="pt", max_length=1024, padding='longest')
         response = model.generate(**inputs)
 
         # Décoder la réponse
-        full_response = tokenizer.decode(response[0], skip_special_tokens=True)
+        output_text = tokenizer.decode(response[0], skip_special_tokens=True)
+        
         # Simulate stream of response with milliseconds delay
-        for chunk in full_response.split():
+        for chunk in output_text.split():
             full_response += chunk + " "
             time.sleep(0.05)
             # Add a blinking cursor to simulate typing
             message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 #TODO :
